@@ -33,6 +33,15 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
+    if "ON" in msg.payload:
+        redOFF()
+        greenON()
+        print("  ON means Green on and Red off")
+    else:
+        redON()
+        greenOFF()
+        print("  OFF means Green off and Red on")
+
     topic = str(msg.topic)
     message = str(msg.payload.decode("utf-8"))
     print(topic+" "+message)
@@ -48,16 +57,10 @@ val = on_message
 
 client.connect(Broker, 1883, 60)
 
-client.loop_start()
+client.loop_forever()
 
 # while True:
-if val == 0:
-    redOFF()
-    greenON()
-else:
-    redON()
-    greenOFF()
         
 #     sensor_data = [read_temp(), read_humidity(), read_pressure()]
 #     client.publish("monto/solar/sensors", str(sensor_data))
-    time.sleep(20)
+time.sleep(20)
