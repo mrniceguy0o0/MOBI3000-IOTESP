@@ -1,0 +1,42 @@
+<resources>
+    //Server string
+    <string name="mqtt_server">tcp://broker.hivemq.com:1883</string>
+
+    //User Name and Password
+    <string name="user_name">USERNAME</string>
+    <string name="password">PASSWORD</string>
+
+    //Connect Messages
+    <string name="connect_success_message">Connected to MQTT Client</string>
+    <string name="connect_failure_message">Failed to connect to MQTT Client</string>
+    <string name="subscription_success_message">Subscribe Successful</string>
+    <string name="subscription_failure_message">Failed to subscribe</string>
+    <string name="mqtt_exception_message">Failure: MQTT Client Connection Exception</string>
+    <string name="mqtt_encoding_exception_message">Failure: MQTT Client Encoding Exception</string>
+
+    //Character Set
+    <string name="char_set">UTF-8</string>
+
+    //MQTT Topics
+    <string name="mqtt_topic">testtopic/testopic12</string>
+
+    //LED States
+    <string name="mqtt_led1_message">one</string>
+    <string name="mqtt_led2_message">two</string>
+    <string name="led1_state_on">ON</string>
+    <string name="led2_state_on">ON</string>
+    <string name="led1_state_off">OFF</string>
+    <string name="led2_state_off">OFF</string>
+
+    //UI
+    <string name="app_name">MQTT LED Controller</string>
+    <string name="app_welcome">MQTT LED Controller</string>
+    <string name="app_instructions">Buttons control the LEDs</string>
+    <string name="button_instructions">Press to change the state</string>
+    <string name="button1_text">LED 1</string>
+    <string name="button2_text">LED 2</string>
+    <string name="led1_status_text">OFF</string>
+    <string name="led2_status_text">OFF</string>
+
+
+</resources>
