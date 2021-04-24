@@ -12,7 +12,16 @@ IPAddress ip(192, 168, 192, 160);
  
 // Sets the server to the public mqhive broker
 const char* server = "broker.hivemq.com"; 
- 
+
+//declare some variables
+int qos = 2;
+String MQTTTopic = "MOBI3000/Final";
+int led2Pin = 6;
+int led1Pin = 3;
+int led1State = 0;
+int led2State = 0;
+
+
 // Ethernet and MQTT related objects
 EthernetClient ethClient;
 PubSubClient mqttClient(ethClient);
@@ -50,7 +59,7 @@ void loop()
   mqttClient.loop();
  
   // Subscribe to the specific MQTT topic
-  mqttClient.subscribe("testtopic/testopic12");
+  mqttClient.subscribe("MOBI3000/Final");
    
   // Set a delay to ensure nothing is happening too quickly.
   delay(1000);
@@ -74,24 +83,30 @@ void subscribeReceive(char* topic, byte* payload, unsigned int length)
     message = message + (char)payload[i];
   }
   //Logic to turn LEDs ON/OFF depending on the message moving through the broker.
-  if(message == "one")
-  {
-    //Turns LED ONE on, prints that it is on in the serial monitor, and publishes a message back to the broker that says "First LED is ON"
-    //HIGH means that the pin is sending power, and LOW means it is not, OR in simpler terms, the first LED connected to that pin is ON if the pin is HIGH, and it is OFF if the pin is LOW
-  Serial.println("LIGHT ONE IS ON");
-    digitalWrite(6, HIGH);
-    digitalWrite(3, LOW);
-    boolean rc = mqttClient.publish("testtopic/testopic12", "First LED is ON");
-    delay(100);
-  }
-  if(message == "four")
-  {
-   Serial.println("LIGHT FOUR IS ON");
-    digitalWrite(6, LOW);
-    digitalWrite(3, HIGH);
-    boolean rc = mqttClient.publish("testtopic/testopic12", "Second LED is ON");
-    delay(100);
+  if(message == "one" && led1State == 0){
+Serial.println("LED 1 on");
+digitalWrite(led1Pin, HIGH);
+mqttClient.publish("MOBI3000/Final", "oneon");
+led1State = 1;
+}
+else if(message == "one" && led1State == 1){
+Serial.println("LED 1 off");
+digitalWrite(led1Pin, LOW);
+mqttClient.publish("MOBI3000/Final", "oneoff");
+led1State = 0;
+}
+else if(message == "two" && led2State == 0){
+Serial.println("LED 2 on");
+digitalWrite(led2Pin, HIGH);
+mqttClient.publish("MOBI3000/Final", "twoon");
+led2State = 1;
+}
+else if(message == "two" && led2State == 1){
+Serial.println("LED 2 off");
+digitalWrite(led2Pin, LOW);
+mqttClient.publish("MOBI3000/Final", "twooff");
+led2State = 0;
+}
   }
   // Print a new line in the serial monitor
-  Serial.println("");
-}
+//  Serial.println("");
