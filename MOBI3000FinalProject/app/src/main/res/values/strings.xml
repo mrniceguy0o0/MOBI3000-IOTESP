@@ -13,16 +13,19 @@
     <string name="subscription_failure_message">Failed to subscribe</string>
     <string name="mqtt_exception_message">Failure: MQTT Client Connection Exception</string>
     <string name="mqtt_encoding_exception_message">Failure: MQTT Client Encoding Exception</string>
+    <string name="mqtt_connection_complete_message">Connection Complete</string>
+    <string name="mqtt_connection_lost_message">Connection Lost</string>
+    <string name="mqtt_delivery_complete_message">Delivery Complete</string>
 
     //Character Set
     <string name="char_set">UTF-8</string>
 
     //MQTT Topics
-    <string name="mqtt_topic">testtopic/testopic12</string>
+    <string name="mqtt_topic">MOBI3000/Final</string>
 
     //LED States
-    <string name="mqtt_led1_message">one</string>
-    <string name="mqtt_led2_message">two</string>
+    <string name="mqtt_led1_message">1</string>
+    <string name="mqtt_led2_message">2</string>
     <string name="led1_state_on">ON</string>
     <string name="led2_state_on">ON</string>
     <string name="led1_state_off">OFF</string>

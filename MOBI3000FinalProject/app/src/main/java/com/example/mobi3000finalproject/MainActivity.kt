@@ -1,17 +1,14 @@
 package com.example.mobi3000finalproject
 
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 import java.io.UnsupportedEncodingException
-import org.eclipse.paho.client.mqttv3.MqttCallback
-import org.eclipse.paho.client.mqttv3.MqttMessage
 
 
 class MainActivity : AppCompatActivity() {
@@ -19,9 +16,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mqttAppintro: TextView
     private lateinit var mqttAppIntroInstructions: TextView
     private lateinit var mqttButtonInstructions: TextView
-    private lateinit var led1StatusText: TextView
+    private lateinit var led1StatusOnTextView: TextView
+    private lateinit var led1StatusOffTextView: TextView
     private lateinit var controlButton1: Button
-    private lateinit var led2StatusText: TextView
+    private lateinit var led2StatusOnTextView: TextView
+    private lateinit var led2StatusOffTextView: TextView
     private lateinit var controlButton2: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,10 +31,12 @@ class MainActivity : AppCompatActivity() {
         mqttAppintro = findViewById(R.id.mqtt_app_intro)
         mqttAppIntroInstructions = findViewById(R.id.mqtt_app_intructions)
         mqttButtonInstructions = findViewById(R.id.mqtt_button_intructions)
+        led1StatusOnTextView = findViewById(R.id.led1_status_on_textview)
+        led1StatusOffTextView = findViewById(R.id.led1_status_off_textview)
         controlButton1 = findViewById(R.id.control_button1)
-        led1StatusText = findViewById(R.id.led1_status_text)
+        led2StatusOnTextView = findViewById(R.id.led2_status_on_textview)
+        led2StatusOffTextView = findViewById(R.id.led2_status_off_textview)
         controlButton2 = findViewById(R.id.control_button2)
-        led2StatusText = findViewById(R.id.led2_status_text)
 
         // Call function to setup and configure MQTT client
         configureMQTTClient()
@@ -51,8 +52,12 @@ class MainActivity : AppCompatActivity() {
         )
         try {
             val options = MqttConnectOptions()
-            options.userName = getString(R.string.user_name)
-            options.password = getString(R.string.password).toCharArray()
+            // Uncomment two line below and update username and password in strings.xml
+            // if using private broker.
+            //options.userName = getString(R.string.user_name)
+            //options.password = getString(R.string.password).toCharArray()
+            options.isAutomaticReconnect = true
+            options.keepAliveInterval = 60
             val token = client.connect(options)
             token.actionCallback = object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken) {
@@ -61,7 +66,6 @@ class MainActivity : AppCompatActivity() {
                     // Call functions to subscribe to MQTT topic, initialize the status listener,
                     // and setup control buttons.
                     subscribe(getString(R.string.mqtt_topic), client)
-                    initStatusListener(getString(R.string.mqtt_topic), client)
                     configureControlButton1(client)
                     configureControlButton2(client)
                 }
@@ -79,13 +83,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun subscribe(topic: String, client: MqttAndroidClient) {
         // Set MQTT quality of service for subscriptions
-        val qos = 2
+        val qos = 0
         try {
             client.subscribe(topic, qos, null, object : IMqttActionListener {
+                //}, object : IMqttMessageListener {
                 override fun onSuccess(asyncActionToken: IMqttToken) {
                     // Log successful subscription
                     Log.d("TAG", getString(R.string.subscription_success_message))
-                }override fun onFailure(
+                    initStatusListener(client)
+                }
+                override fun onFailure(
                     asyncActionToken: IMqttToken,
                     exception: Throwable
                 ) {
@@ -100,17 +107,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Function to initialize subscription status listener. When data is received the messageArrived
+    // Function to initialize status listener. When data is received the messageArrived
     // function is invoked and then the function to update the LED states.
-    private fun initStatusListener(topic: String, client: MqttAndroidClient){
-        // Set MQTT quality of service for incoming messages
-        val qos = 2
+    private fun initStatusListener(client: MqttAndroidClient){
         try {
-            client.subscribe(topic, qos, object : IMqttMessageListener {
-                override fun messageArrived(topic: String?, message: MqttMessage?) {
-                    val receivedMessage = message.toString()
-                    setLEDState(receivedMessage)
+            client.setCallback(object: MqttCallbackExtended {
+                override fun connectComplete(b:Boolean, s:String) {
+                    // Log connection
+                    Log.d("TAG", getString(R.string.mqtt_connection_complete_message))
                 }
+                override fun connectionLost(throwable:Throwable) {
+                    // Log connection lost
+                    Log.d("TAG", getString(R.string.mqtt_connection_lost_message))
+                }
+                override fun messageArrived(topic:String, mqttMessage: MqttMessage) {
+                    setLEDState(mqttMessage.toString())
+                }
+                override fun deliveryComplete(iMqttDeliveryToken: IMqttDeliveryToken) {
+                    // Log delivery complete
+                    Log.d("TAG", getString(R.string.mqtt_delivery_complete_message))
+                }
+
             })
         } catch (e: MqttException) {
             e.printStackTrace()
@@ -128,6 +145,7 @@ class MainActivity : AppCompatActivity() {
             val encodedPayload: ByteArray
             try {
                 encodedPayload = payload.toByteArray(charset(getString(R.string.char_set)))
+
                 val message = MqttMessage(encodedPayload)
                 client.publish(topic, message)
             } catch (e: UnsupportedEncodingException) {
@@ -164,36 +182,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Function to update the states of the LEDs according to the received messages
-    // being subscribed to. If statements check version as getColor required minimum API version 23
+    // being subscribed to.
     private fun setLEDState(message: String){
         // Log message
         Log.d("TAG", message)
         when (message) {
             "oneon" -> {
-                val newText = getString(R.string.led1_state_on)
-                led1StatusText.text = newText
-                // Check against minimum APi version
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    controlButton1.setBackgroundColor(getColor(R.color.led_on_color))
-                }
+                led1StatusOffTextView.visibility = View.INVISIBLE
+                led1StatusOnTextView.visibility = View.VISIBLE
             }
             "oneoff" -> {
-                led1StatusText.text = getString(R.string.led1_state_off)
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    controlButton1.setBackgroundColor(getColor(R.color.led_off_color))
-                }
+                led1StatusOnTextView.visibility = View.INVISIBLE
+                led1StatusOffTextView.visibility = View.VISIBLE
+
             }
             "twoon" -> {
-                led2StatusText.text = getString(R.string.led2_state_on)
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    controlButton2.setBackgroundColor(getColor(R.color.led_on_color))
-                }
+                led2StatusOffTextView.visibility = View.INVISIBLE
+                led2StatusOnTextView.visibility = View.VISIBLE
             }
             "twooff" -> {
-                led2StatusText.text = getString(R.string.led2_state_off)
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    controlButton2.setBackgroundColor(getColor(R.color.led_off_color))
-                }
+                led2StatusOnTextView.visibility = View.INVISIBLE
+                led2StatusOffTextView.visibility = View.VISIBLE
             }
         }
     }

@@ -40,17 +40,34 @@
         app:layout_constraintTop_toBottomOf="@id/mqtt_app_intructions" />
 
     <TextView
-        android:id="@+id/led1_status_text"
+        android:id="@+id/led1_status_on_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/led1_status_text"
+        android:text="@string/led1_state_on"
         android:textSize="26sp"
+        android:textColor="@color/led_on_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="0.28"
-        app:layout_constraintVertical_bias="0.45" />
+        app:layout_constraintVertical_bias="0.45"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/led1_status_off_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/led1_status_text"
+        android:textSize="26sp"
+        android:textColor="@color/led_off_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="0.28"
+        app:layout_constraintVertical_bias="0.45"
+        android:visibility="visible"/>
 
     <Button
         android:id="@+id/control_button1"
@@ -61,23 +78,41 @@
         android:padding="8sp"
         android:text="@string/button1_text"
         android:textColor="@color/white"
+        android:layout_marginTop="25dp"
         app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintLeft_toLeftOf="parent "
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/led1_status_text" />
+        app:layout_constraintTop_toBottomOf="@id/led1_status_off_textview" />
 
     <TextView
-        android:id="@+id/led2_status_text"
+        android:id="@+id/led2_status_on_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/led1_status_text"
+        android:text="@string/led1_state_on"
         android:textSize="26sp"
+        android:textColor="@color/led_on_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="0.72"
-        app:layout_constraintVertical_bias="0.45" />
+        app:layout_constraintVertical_bias="0.45"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/led2_status_off_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/led1_status_text"
+        android:textSize="26sp"
+        android:textColor="@color/led_off_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="0.72"
+        app:layout_constraintVertical_bias="0.45"
+        android:visibility="visible"/>
 
     <Button
         android:id="@+id/control_button2"
@@ -88,9 +123,10 @@
         android:padding="8sp"
         android:text="@string/button2_text"
         android:textColor="@color/white"
+        android:layout_marginTop="25dp"
         app:layout_constraintLeft_toLeftOf="parent "
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="0.75"
-        app:layout_constraintTop_toBottomOf="@id/led2_status_text"/>
+        app:layout_constraintTop_toBottomOf="@id/led2_status_off_textview"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
